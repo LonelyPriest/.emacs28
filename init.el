@@ -46,8 +46,8 @@
 (require 'init-preload-local nil t)
 (require 'emacs-std)
 
-(require 'session)
-(add-hook 'after-init-hook 'session-initialize)
+;; (require 'session)
+;; (add-hook 'after-init-hook 'session-initialize)
 
 (require 'desktop)
 (desktop-save-mode)
@@ -60,6 +60,11 @@
 
 (use-package counsel
   :ensure t)
+
+(use-package session
+  :ensure t
+  :hook
+  (after-init-hook . session-initialize))
 
 (use-package ivy
   :ensure t
@@ -80,6 +85,10 @@
    ("C-x C-SPC" . 'counsel-mark-ring)
    :map minibuffer-local-map
    ("C-r" . counsel-minibuffer-history)))
+
+(use-package amx
+  :ensure t
+  :init (amx-mode))
 
 ;; 切换窗口
 (use-package ace-window
@@ -204,6 +213,13 @@
   :ensure t
   :after (lsp-mode))
 
+(use-package flycheck
+  :ensure t
+  :config
+  (setq truncate-lines nil)
+  :hook
+  (c-mode . flycheck-mode)
+  (c++-mode . flycheck-mode))
 
 (use-package projectile
   :ensure t
@@ -273,6 +289,28 @@
 
 (setq c-default-style "linux")
 (setq c-basic-offset 4)
+
+(use-package c++-mode
+  :functions
+  c-toggle-hungry-state
+  :hook
+  (c-mode . lsp-deferred)
+  (c++-mode . lsp-deferred)
+  (c++-mode . c-toggle-hungry-state))
+
+(use-package clang-format+
+  :ensure t
+  :init
+  (setq c-basic-offset-4)
+  (setq c-default-style "linux")
+  :config
+  (add-hook 'c-mode-hook #'clang-format+-mode)
+  (add-hook 'c++-mode-hook #'clang-format+-mode)
+  :bind
+  (("C-M-\\". clang-format-buffer)))
+
+(global-set-key (kbd "C-j f") 'ff-find-other-file)
+(yas-global-mode nil)
 
 (provide 'init)
 
